@@ -36,16 +36,31 @@ export const addShow = async (req, res) =>{
 
     if(!movie) {
       //fetch movie details and credits from TMDB api 
-     const [movieDetailsResponse, movieCreditsResponse]= await Promise.all([
-        axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {headers:{
-        Authorization:`Bearer ${process.env.TMDB_API_KEY}`}}),
-        axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {headers:{
-        Authorization:`Bearer ${process.env.TMDB_API_KEY}`}})
-      ])
+     const movieDetailsResponse = await axios.get(
+  `https://api.themoviedb.org/3/movie/${movieId}`,
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+      accept: "application/json",
+    },
+    timeout: 10000
+  }
+);
+
+const movieCreditsResponse = await axios.get(
+  `https://api.themoviedb.org/3/movie/${movieId}/credits`,
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+      accept: "application/json",
+    },
+    timeout: 10000
+  }
+);
+
 
       const movieApiData=movieDetailsResponse.data;
       const movieCreditData= movieCreditsResponse.data;
-      console.log(movieCreditData.cast) 
       //create movie object
       const movieDetails= {
         _id:movieId,
@@ -91,14 +106,16 @@ export const addShow = async (req, res) =>{
         movieTitle:movie.title
       }
     })
-    
+    console.log("EVENT SENT: app/show.added")
+
+
     res.json({
       success:true,
       message: 'show added successfully'
     })
 
    }catch(err) {
-    console.log("Error occured while add show to database")
+    console.log("Error occured while add show to database",err.message)
     res.json({
       success:false,
       message:err.message
