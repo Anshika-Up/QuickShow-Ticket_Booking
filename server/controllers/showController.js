@@ -126,7 +126,10 @@ const movieCreditsResponse = await axios.get(
 // function to get All shows from the database
 export const getShows= async(req, res) =>{
   try{
-    const shows= await Show.find({showDateTime: {$gte:new Date()}}).populate('movie').sort({showDateTime: 1});
+    // const shows= await Show.find({showDateTime: {$gte:new Date()}}).populate('movie').sort({showDateTime: 1});
+    const shows = await Show.find({})
+  .populate("movie")
+  .sort({ showDateTime: 1 });
 
     //filter unique show (unique movie)
     const uniqueShows= new Set(shows.map((show )=> show.movie));
